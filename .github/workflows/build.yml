@@ -4,14 +4,18 @@ jobs:
   build:
     name: Build
     runs-on: windows-latest
+    strategy:
+      matrix:
+        platform: [x86_64-pc-win32-msvc, aarch64-pc-win32-msvc]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Build
       shell: cmd
-      run: clang -fuse-ld=lld -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS capture.cxx conv.cxx wave.cxx program.cxx -lole32
+      run: clang -fuse-ld=lld --target=${{ matrix.platform }} -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS capture.cxx conv.cxx wave.cxx program.cxx -lole32
     - name: Artifact
       uses: actions/upload-artifact@v3
       with:
+        name: a.exe-${{ matrix.platform }}
         path: a.exe
         if-no-files-found: error
